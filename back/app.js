@@ -1,0 +1,1 @@
+app.use('/api/reservation', require('./routes/getReservation')); 

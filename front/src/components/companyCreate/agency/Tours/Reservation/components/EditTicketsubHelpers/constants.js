@@ -1,0 +1,1 @@
+export const CURRENCIES = ['TL', 'USD', 'EUR', 'GBP']; 

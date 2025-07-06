@@ -1,0 +1,3 @@
+ALTER TABLE safe_records
+ADD COLUMN currency VARCHAR(10) DEFAULT NULL AFTER payment_type,
+ADD COLUMN amount DECIMAL(10,2) DEFAULT NULL AFTER currency; 
