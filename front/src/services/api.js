@@ -2,8 +2,8 @@ import axios from 'axios';
 import { format } from 'date-fns';
 
 // Production API URL
-const API_URL = 'http://localhost:5000';
-//const API_URL = 'http://13.216.32.130:5000';
+//const API_URL = 'http://localhost:5000';
+const API_URL = 'http://13.216.32.130:5000';
 
 
 const api = axios.create({
