@@ -15,12 +15,14 @@ const GuideOperations = () => {
   
   // Seçili rehberi localStorage'dan al veya boş string kullan
   const savedGuideName = localStorage.getItem('selectedGuideName') || '';
-  const savedSelectedDate = localStorage.getItem('selectedDate') || '';
+  const savedStartDate = localStorage.getItem('selectedStartDate') || '';
+  const savedEndDate = localStorage.getItem('selectedEndDate') || '';
 
   // Filtreleri localStorage'dan al veya boş değerlerle başlat
   const [filters, setFilters] = useState({
     guideName: savedGuideName,
-    selectedDate: savedSelectedDate
+    startDate: savedStartDate,
+    endDate: savedEndDate
   });
 
   // Tahsilat kayıtları için filtre
@@ -86,8 +88,11 @@ const GuideOperations = () => {
     if (name === 'guideName') {
       localStorage.setItem('selectedGuideName', value);
     }
-    if (name === 'selectedDate') {
-      localStorage.setItem('selectedDate', value);
+    if (name === 'startDate') {
+      localStorage.setItem('selectedStartDate', value);
+    }
+    if (name === 'endDate') {
+      localStorage.setItem('selectedEndDate', value);
     }
     setFilters(prev => ({
       ...prev,
@@ -163,8 +168,8 @@ const GuideOperations = () => {
       const trimmedFilters = {
         ...filters,
         guideName: filters.guideName.trim(),
-        startDate: filters.selectedDate,
-        endDate: filters.selectedDate
+        startDate: filters.startDate,
+        endDate: filters.endDate
       };
       
       // Rezervasyonları getir
@@ -568,13 +573,23 @@ const GuideOperations = () => {
                     ))}
                   </select>
                 </div>
-                <div className="col-md-4">
-                  <label className="form-label">Oluşturma Tarihi</label>
+                <div className="col-md-3">
+                  <label className="form-label">Başlangıç Tarihi</label>
                   <input
                     type="date"
                     className="form-control"
-                    name="selectedDate"
-                    value={filters.selectedDate}
+                    name="startDate"
+                    value={filters.startDate}
+                    onChange={handleFilterChange}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <label className="form-label">Bitiş Tarihi</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    name="endDate"
+                    value={filters.endDate}
                     onChange={handleFilterChange}
                   />
                 </div>

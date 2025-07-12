@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-//const API_URL = 'http://localhost:5000';
-const API_URL = 'http://13.216.32.130:5000';
-
+const API_URL = 'http://localhost:5000';
 
 const api2 = axios.create({
     baseURL: API_URL,
@@ -79,7 +77,7 @@ export const guideOperations = {
     // Rezervasyonları ve biletleri getirme
     getGuideReservationsWithTickets: async (companyId, filters = {}) => {
         try {
-            const response = await api2.get(`/guide/reservations-with-tickets/${companyId}`, {
+            const response = await api2.get(`/guide-process/reservations-with-tickets/${companyId}`, {
                 params: {
                     startDate: filters.startDate,
                     endDate: filters.endDate,

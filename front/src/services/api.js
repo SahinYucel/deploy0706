@@ -2,8 +2,8 @@ import axios from 'axios';
 import { format } from 'date-fns';
 
 // Production API URL
-//const API_URL = 'http://localhost:5000';
-const API_URL = 'http://13.216.32.130:5000';
+const API_URL = 'http://localhost:5000';
+//const API_URL = 'http://13.216.32.130:5000';
 
 
 const api = axios.create({
@@ -220,9 +220,13 @@ export const getSafes = async (companyId) => {
   }
 };
 
-export const getSafeRecords = async (companyId) => {
+export const getSafeRecords = async (companyId, dateFilters = {}) => {
   try {
-    const response = await api.get(`/safe-data/records/${companyId}`);
+    const params = {};
+    if (dateFilters.startDate) params.startDate = dateFilters.startDate;
+    if (dateFilters.endDate) params.endDate = dateFilters.endDate;
+    
+    const response = await api.get(`/safe-data/records/${companyId}`, { params });
     return response.data;
   } catch (error) {
     console.error('Safe records getirme hatası:', error);

@@ -129,8 +129,24 @@ module.exports = (db) => {
   // Safe records'ı getir
   router.get('/records/:companyId', async (req, res) => {
     const { companyId } = req.params;
+    const { startDate, endDate } = req.query;
 
     try {
+      let whereClause = `WHERE sr.transaction_no IS NOT NULL`;
+      const queryParams = [];
+
+      // Tarih filtresi ekle
+      if (startDate && endDate) {
+        whereClause += ` AND DATE(sr.created_at) BETWEEN ? AND ?`;
+        queryParams.push(startDate, endDate);
+      } else if (startDate) {
+        whereClause += ` AND DATE(sr.created_at) >= ?`;
+        queryParams.push(startDate);
+      } else if (endDate) {
+        whereClause += ` AND DATE(sr.created_at) <= ?`;
+        queryParams.push(endDate);
+      }
+
       const sql = `
         WITH currency_totals AS (
           SELECT 
@@ -160,12 +176,12 @@ module.exports = (db) => {
           END as amounts
         FROM safe_records sr
         LEFT JOIN currency_totals ct ON sr.transaction_no COLLATE utf8mb4_unicode_ci = ct.transaction_code COLLATE utf8mb4_unicode_ci
-        WHERE sr.transaction_no IS NOT NULL
+        ${whereClause}
         GROUP BY sr.transaction_no, sr.account_name, sr.description, sr.payment_type, sr.payment_method, sr.currency, sr.amount
         ORDER BY created_at DESC
       `;
       
-      const records = await query(sql);
+      const records = await query(sql, queryParams);
       res.json(records);
 
     } catch (error) {

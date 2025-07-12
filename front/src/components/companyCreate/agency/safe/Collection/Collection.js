@@ -59,7 +59,7 @@ export default function Collection() {
       try {
         setLoading(true);
         const [loadedRecords, safes] = await Promise.all([
-          getSafeRecords(companyId),
+          getSafeRecords(companyId, filterDate),
           getSafes(companyId)
         ]);
         
@@ -96,7 +96,54 @@ export default function Collection() {
     };
 
     loadRecords();
-  }, [companyId]);
+  }, [companyId, filterDate]);
+
+  const handleApplyFilters = () => {
+    // Tarih filtrelerini uygulamak için loadRecords'ı tekrar çağır
+    const loadRecords = async () => {
+      if (!companyId) return;
+      
+      try {
+        setLoading(true);
+        const [loadedRecords, safes] = await Promise.all([
+          getSafeRecords(companyId, filterDate),
+          getSafes(companyId)
+        ]);
+        
+        setRecords(loadedRecords);
+        
+        // Safe tablosundan toplamları hesapla
+        const safeTotals = {
+          gelir: { cash: {}, card: {} },
+          gider: { cash: {}, card: {} }
+        };
+
+        safes.forEach(safe => {
+          const paymentMethod = safe.type === 'card' ? 'card' : 'cash';
+          
+          // Gelir (balance)
+          if (safe.balance > 0) {
+            safeTotals.gelir[paymentMethod][safe.name] = (safeTotals.gelir[paymentMethod][safe.name] || 0) + safe.balance;
+          }
+          
+          // Gider (negativebalance)
+          if (safe.negativebalance > 0) {
+            safeTotals.gider[paymentMethod][safe.name] = (safeTotals.gider[paymentMethod][safe.name] || 0) + safe.negativebalance;
+          }
+        });
+        
+        setTotals(safeTotals);
+        setError(null);
+      } catch (error) {
+        setError('Kasa kayıtları yüklenirken bir hata oluştu');
+        console.error('Error loading safe records:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRecords();
+  };
 
   const handleDateFilter = (e) => {
     const { name, value } = e.target;
@@ -490,6 +537,14 @@ export default function Collection() {
                       <option value="gelir">Gelir</option>
                       <option value="gider">Gider</option>
                     </Form.Select>
+                  </Form.Group>
+                </Col>
+                <Col md={2}>
+                  <Form.Group>
+                    <Form.Label>&nbsp;</Form.Label>
+                    <Button variant="primary" onClick={handleApplyFilters} className="w-100">
+                      <i className="fas fa-filter me-2"></i>Filtrele
+                    </Button>
                   </Form.Group>
                 </Col>
               </Row>

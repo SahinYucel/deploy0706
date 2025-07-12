@@ -21,9 +21,9 @@ module.exports = (db) => {
     // Tüm rezervasyonları ve biletleri getir
     router.get('/reservations-with-tickets/:companyId', async (req, res) => {
         try {
-            const { guideName, startDate } = req.query;
+            const { guideName, startDate, endDate } = req.query;
             
-            console.log('Received params:', { guideName, startDate });
+            console.log('Received params:', { guideName, startDate, endDate });
 
             // Debug için rest miktarlarını kontrol edelim
             const checkRestQuery = `
@@ -240,10 +240,16 @@ module.exports = (db) => {
                 queryParams.push(guideName);
             }
 
-            // Tarih filtresi
-            if (startDate) {
-                query += ` AND DATE(r.created_at) = ?`;
+            // Tarih filtresi - startDate ve endDate kontrolü
+            if (startDate && endDate) {
+                query += ` AND DATE(r.created_at) BETWEEN ? AND ?`;
+                queryParams.push(startDate, endDate);
+            } else if (startDate) {
+                query += ` AND DATE(r.created_at) >= ?`;
                 queryParams.push(startDate);
+            } else if (endDate) {
+                query += ` AND DATE(r.created_at) <= ?`;
+                queryParams.push(endDate);
             }
 
             // Gruplandırma ekle
